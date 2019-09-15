@@ -6,6 +6,7 @@ from orm.entities import *
 from orm.entities import Invoice
 from orm.entities.Submission import TallySheet
 from orm.entities.SubmissionVersion.TallySheetVersion import TallySheetVersionCE201
+from orm.entities.Survey import QuestionModel, SurveyModel
 from orm.enums import TallySheetCodeEnum, BallotTypeEnum
 from util import get_tally_sheet_code
 
@@ -275,4 +276,35 @@ def build_database(dataset):
         election.add_candidate(candidateId=candidate.candidateId, partyId=party.partyId)
     for row in get_rows_from_csv('invalid-vote-categories.csv'):
         election.add_invalid_vote_category(row["Invalid Vote Category Description"])
+
+    answer_to_db_object = {}
+    question_to_db_object = {}
+    survey_to_db_object = {}
+
+    for row in get_rows_from_csv('survey.csv'):
+        survey = row.get("Survey")
+        question = row.get("Question")
+        answer = row.get("Answer")
+
+        if answer not in answer_to_db_object.keys():
+            answer_db_object = Answer.create(answer)
+            answer_to_db_object.update({answer: answer_db_object})
+            db.session.add(answer_db_object)
+
+        if question not in question_to_db_object.keys():
+            question_db_object = Question.create(question)
+            question_to_db_object.update({question: question_db_object})
+            db.session.add(question_db_object)
+
+        if survey not in survey_to_db_object.keys():
+            survey_db_object = Survey.create(survey)
+            survey_to_db_object.update({survey: survey_db_object})
+            db.session.add(survey_db_object)
+
+        question_db_object: QuestionModel = question_to_db_object.get(question)
+        question_db_object.add_answer(answer_to_db_object.get(answer))
+
+        survey_db_object: SurveyModel = survey_to_db_object.get(survey)
+        survey_db_object.add_question(question_db_object)
+
     db.session.commit()

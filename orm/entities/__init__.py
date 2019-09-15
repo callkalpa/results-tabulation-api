@@ -26,6 +26,9 @@ from orm.entities.TallySheetVersionRow import TallySheetVersionRow_PRE_41, Tally
 
 from orm.entities.Election import InvalidVoteCategory
 
+from orm.entities import Survey
+from orm.entities.Survey import Question, Answer
+
 # import sadisplay
 # import codecs
 #

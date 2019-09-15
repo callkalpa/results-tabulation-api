@@ -2,7 +2,7 @@ from marshmallow.fields import Integer, String
 
 from app import db, ma
 from orm.entities import StationaryItem, Ballot, Invoice, BallotBox, \
-    Election, Proof, Submission, Electorate, SubmissionVersion, Area, Party, BallotBook
+    Election, Proof, Submission, Electorate, SubmissionVersion, Area, Party, BallotBook, Survey
 from orm.entities.Election import InvalidVoteCategory
 from orm.entities.IO import File
 from orm.entities.Invoice import InvoiceStationaryItem
@@ -10,6 +10,7 @@ from orm.entities.SubmissionVersion import TallySheetVersion
 from orm.entities.Submission import TallySheet
 from orm.entities.SubmissionVersion.TallySheetVersion import TallySheetVersionCE201, TallySheetVersionPRE41, \
     TallySheetVersionPRE21, TallySheetVersion_PRE_30_PD, TallySheetVersion_PRE_30_ED
+from orm.entities.Survey import Answer, Question
 from orm.entities.TallySheetVersionRow import TallySheetVersionRow_CE_201, TallySheetVersionRow_PRE_41, \
     TallySheetVersionRow_PRE_21, TallySheetVersionRow_PRE_ALL_ISLAND_RESULT, TallySheetVersionRow_PRE_30_ED, \
     TallySheetVersionRow_PRE_30_PD
@@ -212,6 +213,51 @@ class AreaSchema(ma.ModelSchema):
     pollingStations = ma.Nested('OfficeSchema', only=["officeId", "officeName", "officeType"], many=True)
     countingCentres = ma.Nested('OfficeSchema', only=["officeId", "officeName", "officeType"], many=True)
     districtCentres = ma.Nested('OfficeSchema', only=["officeId", "officeName", "officeType"], many=True)
+
+
+class AnswerSchema(ma.ModelSchema):
+    class Meta:
+        fields = (
+            "answerId",
+            "answerText"
+        )
+
+        model = Answer.Model
+        # optionally attach a Session
+        # to use for deserialization
+        sqla_session = db.session
+
+
+class QuestionSchema(ma.ModelSchema):
+    class Meta:
+        fields = (
+            "questionId",
+            "questionText",
+            "answers"
+        )
+
+        model = Question.Model
+        # optionally attach a Session
+        # to use for deserialization
+        sqla_session = db.session
+
+    answers = ma.Nested(AnswerSchema, many=True)
+
+
+class SurveySchema(ma.ModelSchema):
+    class Meta:
+        fields = (
+            "surveyId",
+            "surveyName",
+            "questions"
+        )
+
+        model = Survey.Model
+        # optionally attach a Session
+        # to use for deserialization
+        sqla_session = db.session
+
+    questions = ma.Nested(QuestionSchema, many=True)
 
 
 class ElectorateSchema(ma.ModelSchema):
