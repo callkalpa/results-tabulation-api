@@ -12,6 +12,7 @@ class QuestionModel(db.Model):
 
     def add_answer(self, answer: AnswerModel):
         self.answers.append(answer)
+        return self
 
 
 class QuestionAnswerModel(db.Model):

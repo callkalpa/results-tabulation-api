@@ -13,8 +13,9 @@ class SurveyModel(db.Model):
 
     def add_question(self, question: QuestionModel):
         self.questions.append(question)
+        return self
 
-    
+
 class SurveyQuestionModel(db.Model):
     __tablename__ = "survey_question"
     surveyId = db.Column(db.Integer, db.ForeignKey("survey.surveyId"), primary_key=True)
